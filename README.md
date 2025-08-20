@@ -52,5 +52,5 @@ A API implementa os seguintes endpoints:
 
 1. Clone o repositório:  
    ```bash
-   git clone <URL_DO_REPOSITORIO>
+   git clone <[URL_DO_REPOSITORIO](https://github.com/pablobmm/atividade_flask.git)>
    cd <NOME_DA_PASTA>
