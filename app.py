@@ -2,15 +2,13 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-users = [{"Nome":"Pablo",
-"Email": "pablobarros123@gmail.com"}
-]
+users = []
 current_id = 1
 
 @app.route('/users', methods=['POST'])
 def criarUsuario():
     global current_id
-    dados = request.json
+    dados = request.get_json()
     nome = dados.get('nome')
     email = dados.get('email')
 
@@ -59,10 +57,9 @@ def update_user(user_id):
 def deletar_usuario(user_id):
     for i, user in enumerate(users):
         if user['id'] == user_id:
-            users.pop(i) 
+            users.pop(i)
             return jsonify({"message": "Usuário excluído com sucesso"}), 200
     return jsonify({"erro": "Usuário não encontrado"}), 404
-
 
 if __name__ == "__main__":
     app.run(debug=True)
