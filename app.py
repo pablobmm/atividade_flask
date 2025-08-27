@@ -1,65 +1,62 @@
-from flask import Flask, request, jsonify
+from controllers.task_controller import TaskController
+from models import db
+from flask import redirect,request,render_template,Flask
+import os
 
+
+task_controller = TaskController()
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-users = []
-current_id = 1
 
-@app.route('/users', methods=['POST'])
-def criarUsuario():
-    global current_id
-    dados = request.get_json()
-    nome = dados.get('nome')
-    email = dados.get('email')
 
-    if not nome or not email:
-        return jsonify({"erro": "O campo nome e email devem ser preenchidos"}), 400
+db.init_app(app)
 
-    novo_usuario = {
-        'id': current_id,
-        'nome': nome,
-        'email': email
-    }
+with app.app_context():
+    db.create_all()
 
-    users.append(novo_usuario)
-    current_id += 1
 
-    return jsonify(novo_usuario), 201
 
-@app.route('/users', methods=['GET'])
-def get_users():
-    return jsonify(users), 200
+class Config:
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///users.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+    
 
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user_by_id(user_id):
-    for user in users:
-        if user['id'] == user_id:
-            return jsonify(user), 200
-    return jsonify({"erro": "Usuário não encontrado"}), 404
+@app.route('/tasks/new', methods=['GET', 'POST'])
+def create_task():
+    if request.method == 'POST':
+        return redirect('/tasks') 
+    else:
+        return render_template('create_task.html')
+    
 
-@app.route('/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    dados = request.get_json()
-    nome = dados.get('nome')
-    email = dados.get('email')
 
-    for user in users:
-        if user['id'] == user_id:
-            if nome:
-                user['nome'] = nome
-            if email:
-                user['email'] = email
-            return jsonify(user), 200
+# Rota para listar tarefas
+@app.route('/tasks', methods=['GET'])
+def list_tasks():
+    return task_controller.list_tasks()
 
-    return jsonify({"erro": "Usuário não encontrado"}), 404
+# Rota para criar tarefa (GET mostra formulário, POST cria)
+@app.route('/tasks/new', methods=['GET', 'POST'])
+def create_task():
+    if request.method == 'POST':
+        return task_controller.create_task()
+    else:
+        return task_controller.create_task_get()  # Caso você tenha método separado para mostrar o formulário
 
-@app.route('/users/<int:user_id>', methods=['DELETE'])
-def deletar_usuario(user_id):
-    for i, user in enumerate(users):
-        if user['id'] == user_id:
-            users.pop(i)
-            return jsonify({"message": "Usuário excluído com sucesso"}), 200
-    return jsonify({"erro": "Usuário não encontrado"}), 404
+# Rota para atualizar status da tarefa
+@app.route('/tasks/update/<int:task_id>', methods=['POST'])
+def update_task_status(task_id):
+    return task_controller.update_task_status(task_id)
 
-if __name__ == "__main__":
+# Rota para deletar tarefa
+@app.route('/tasks/delete/<int:task_id>', methods=['POST'])
+def delete_task(task_id):
+    return task_controller.delete_task(task_id)
+
+if __name__ == '__main__':
     app.run(debug=True)
