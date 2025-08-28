@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Tarefas</title>
+</head>
+<body>
+    <h1>Minhas Tarefas</h1>
+
+    <a href="{{ url_for('create_task') }}">➕ Nova Tarefa</a>
+
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Descrição</th>
+                <th>Status</th>
+                <th>Usuário</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description}}</td>
+                <td>{{ task.status }}</td>
+                <td>{{ task.user.name }}</td>
+                <td>
+                    <form action="{{ url_for('update_task_status', task_id=task.id) }}" method="post" style="display:inline;">
+                        <button type="submit">
+                            {% if task.status == "Pendente" %}
+                                ✅ Concluir
+                            {% else %}
+                                ↩️ Reabrir
+                            {% endif %}
+                        </button>
+                    </form>
+                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Tem certeza que deseja excluir?')">🗑 Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
