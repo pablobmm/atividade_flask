@@ -2,25 +2,13 @@ from controllers.task_controller import TaskController
 from models import db
 from flask import redirect, request, render_template, Flask
 import os
-
-
 app = Flask(__name__)
-
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-
 db.init_app(app)
-
-
 with app.app_context():
     db.create_all()
-
-
 task_controller = TaskController()
-
-
 @app.route('/tasks', methods=['GET'])
 def list_tasks():
     return task_controller.list_tasks()
@@ -28,7 +16,6 @@ def list_tasks():
 
 @app.route('/tasks/new', methods=['GET', 'POST'])
 def create_task():
-
     return task_controller.create_task()
 
 
