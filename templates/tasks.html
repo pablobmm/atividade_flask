@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <title>Minhas Tarefas</title>
 </head>
+<style>
+    h1{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body{
+        background-color: bisque;
+    }
+</style>
 <body>
     <h1>Minhas Tarefas</h1>
 
-    <a href="{{ url_for('create_task') }}">➕ Nova Tarefa</a>
+    <a href="{{ url_for('create_task') }}"> Nova Tarefa</a>
 
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -30,19 +38,49 @@
                     <form action="{{ url_for('update_task_status', task_id=task.id) }}" method="post" style="display:inline;">
                         <button type="submit">
                             {% if task.status == "Pendente" %}
-                                ✅ Concluir
+                                Concluir
                             {% else %}
-                                ↩️ Reabrir
+                                Reabrir
                             {% endif %}
                         </button>
                     </form>
-                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" style="display:inline;">
-                        <button type="submit" onclick="return confirm('Tem certeza que deseja excluir?')">🗑 Excluir</button>
-                    </form>
+                   <button onclick="deleteTask({{ task.id }})">Excluir</button>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+
+
+
+
+<script>
+    function deleteTask(taskId) {
+        if (confirm('Tem certeza que deseja excluir?')) {
+            fetch(`/tasks/delete/${taskId}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json()) 
+            .then(data => {
+                
+                if (data.success) {
+                    window.location.reload(); 
+                } else {
+                    alert('Falha ao excluir a tarefa: ' + (data.message || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro de comunicação com o servidor.');
+            });
+        }
+    }
+</script>
+
+
+
+
+
 </body>
 </html>

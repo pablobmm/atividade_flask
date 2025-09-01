@@ -37,7 +37,7 @@ def update_task_status(task_id):
     return task_controller.update_task_status(task_id)
 
 
-@app.route('/tasks/delete/<int:task_id>', methods=['POST'])
+@app.route('/tasks/delete/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     return task_controller.delete_task(task_id)
 
