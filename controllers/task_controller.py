@@ -1,44 +1,57 @@
-from flask import render_template, request, redirect, url_for,jsonify
+from flask import request, jsonify
 from models.task import Task
 from models.users import User
-from models.task import db
+from models import db
 
 class TaskController:
 
     @staticmethod
     def list_tasks():
         tasks = Task.query.all()
-        return render_template('tasks.html', tasks=tasks)
+        output = []
+        for task in tasks:
+            task_data = {
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status,
+                'user_id': task.user_id
+            }
+            output.append(task_data)
+        return jsonify({'tasks': output})
 
     @staticmethod
     def create_task():
-        if request.method == 'POST':
-            title = request.form.get('title')
-            description = request.form.get('description')
-            user_id = request.form.get('user_id')
-            new_task = Task(title=title, description=description, user_id=user_id)
-            db.session.add(new_task)
-            db.session.commit()
-            return redirect(url_for('list_tasks'))
-        else: 
-            users = User.query.all()
-            return render_template('create_task.html', users=users)
+        data = request.get_json()
+        new_task = Task(
+            title=data['title'],
+            description=data.get('description', ''),
+            user_id=data['user_id']
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        return jsonify({'message': 'Nova tarefa criada!'}), 201
 
     @staticmethod
-    def update_task_status(task_id):
-        
+    def update_task(task_id):
         task = Task.query.get(task_id)
-        if task:
-            task.status = 'Concluído' if task.status == 'Pendente' else 'Pendente'
-            db.session.commit()
-        return redirect(url_for('list_tasks'))
+        if not task:
+            return jsonify({'message': 'Tarefa não encontrada'}), 404
+
+        data = request.get_json()
+        task.title = data.get('title', task.title)
+        task.description = data.get('description', task.description)
+        task.status = data.get('status', task.status)
+        
+        db.session.commit()
+        return jsonify({'message': 'Tarefa atualizada!'})
 
     @staticmethod
     def delete_task(task_id):
         task = Task.query.get(task_id)
-        if task:
-            db.session.delete(task)
-            db.session.commit()
-            return jsonify({'success': True}), 200
-        else:
-            return jsonify({'success': False, 'message': 'Tarefa não encontrada'}), 404
+        if not task:
+            return jsonify({'message': 'Tarefa não encontrada'}), 404
+
+        db.session.delete(task)
+        db.session.commit()
+        return jsonify({'message': 'Tarefa excluída!'})
