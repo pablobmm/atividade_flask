@@ -9,5 +9,9 @@ class User(db.Model):
 
     tasks = db.relationship("Task", back_populates="user", lazy=True)
 
-    def __repr__(self):
-        return f'<User {self.name}>'
+     def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email
+        }

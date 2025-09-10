@@ -1,119 +1,28 @@
-# app.py
-
 from flask import Flask
-from models import db
-from controllers.task_controller import TaskController
+from flask_migrate import Migrate
 from flasgger import Swagger
+from config import Config
+from models import db  
+from controllers import task_controller, user_controller
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(Config)
 
 db.init_app(app)
+migrate = Migrate(app, db)
 swagger = Swagger(app)
 
-with app.app_context():
-    db.create_all()
+# Rotas Tasks
+app.add_url_rule('/tasks', 'list_tasks', task_controller.list_tasks, methods=['GET'])
+app.add_url_rule('/tasks', 'create_task', task_controller.create_task, methods=['POST'])
+app.add_url_rule('/tasks/<int:task_id>', 'update_task', task_controller.update_task, methods=['PUT'])
+app.add_url_rule('/tasks/<int:task_id>', 'delete_task', task_controller.delete_task, methods=['DELETE'])
 
-# --- ROTAS DA API COM DOCUMENTAÇÃO ---
-
-@app.route('/tasks', methods=['GET'])
-def list_tasks_route():
-    """
-    Lista todas as tarefas
-    Este endpoint retorna uma lista de todas as tarefas cadastradas.
-    ---
-    tags:
-      - Tasks
-    responses:
-      200:
-        description: Uma lista de tarefas.
-    """
-    return TaskController.list_tasks()
-
-@app.route('/tasks', methods=['POST'])
-def create_task_route():
-    """
-    Cria uma nova tarefa
-    Este endpoint cria uma nova tarefa com base nos dados fornecidos.
-    ---
-    tags:
-      - Tasks
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - title
-            - user_id
-          properties:
-            title:
-              type: string
-            description:
-              type: string
-            user_id:
-              type: integer
-    responses:
-      201:
-        description: Tarefa criada com sucesso.
-    """
-    return TaskController.create_task()
-
-@app.route('/tasks/<int:task_id>', methods=['PUT'])
-def update_task_route(task_id):
-    """
-    Atualiza uma tarefa existente
-    Este endpoint atualiza os dados de uma tarefa específica.
-    ---
-    tags:
-      - Tasks
-    parameters:
-      - name: task_id
-        in: path
-        type: integer
-        required: true
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          properties:
-            title:
-              type: string
-            description:
-              type: string
-            status:
-              type: string
-    responses:
-      200:
-        description: Tarefa atualizada com sucesso.
-      404:
-        description: Tarefa não encontrada.
-    """
-    return TaskController.update_task(task_id)
-
-@app.route('/tasks/<int:task_id>', methods=['DELETE'])
-def delete_task_route(task_id):
-    """
-    Exclui uma tarefa
-    Este endpoint remove uma tarefa do banco de dados.
-    ---
-    tags:
-      - Tasks
-    parameters:
-      - name: task_id
-        in: path
-        type: integer
-        required: true
-    responses:
-      200:
-        description: Tarefa excluída com sucesso.
-      404:
-        description: Tarefa não encontrada.
-    """
-    return TaskController.delete_task(task_id)
+# Rotas Users
+app.add_url_rule('/users', 'list_users', user_controller.list_users, methods=['GET'])
+app.add_url_rule('/users', 'create_user', user_controller.create_user, methods=['POST'])
+app.add_url_rule('/users/<int:user_id>', 'update_user', user_controller.update_user, methods=['PUT'])
+app.add_url_rule('/users/<int:user_id>', 'delete_user', user_controller.delete_user, methods=['DELETE'])
 
 if __name__ == '__main__':
     app.run(debug=True)
