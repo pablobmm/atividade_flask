@@ -1,9 +1,0 @@
-Flask
-Flask-SQLAlchemy
-pymysql
-numpy
-pandas
-cryptography
-Werkzeug
-Flask-Cors
-Flasgger
