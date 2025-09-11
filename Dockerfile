@@ -5,8 +5,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt
 
-COPY . .
+COPY apps/ . .
 
 EXPOSE 5002
 
-CMD ["python", "-m", "apps.app"]
+CMD python -m apps.app
