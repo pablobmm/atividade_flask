@@ -3,7 +3,7 @@ from .route_user import user_ns, user_model
 from ..database import db
 from .model_user import User
 
-@user_ns.route('/')
+@user_ns.route('/user')
 class UserList(Resource):
     @user_ns.marshal_list_with(user_model)
     def get(self):
