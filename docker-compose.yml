@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    # Constrói a imagem a partir do Dockerfile no diretório atual
+    build: .
+
+    # Mapeia a porta 5000 do seu computador para a porta 5000 do container
+    ports:
+      - "5000:5000"
+
+    # Define um volume para persistir o banco de dados
+    # Isso é CRUCIAL para que a pasta 'instance' e seu banco de dados
+    # não sejam apagados quando o container for reiniciado.
+    volumes:
+      - ./instance:/app/instance
