@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 app.config["HOST"] = "0.0.0.0"
-app.config["PORRT"] = 5002
+app.config["PORT"] = 5002
 app.config["DEBUG"] = True
 
 DB_USER = os.environ.get("DB_USER") or 'adm'
