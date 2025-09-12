@@ -1,5 +1,6 @@
 from . config import app, db_serv
-from .users.route_user import bd_user
+from .controllers.user_controller import bd_user
+
 
 db_serv.init_app(app)
 
