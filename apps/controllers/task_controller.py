@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for
 from models import db
-from models.model_task import Task
+from apps.controllers.user_controller import Task
 from models.model_user import User
 
 class TaskController:
