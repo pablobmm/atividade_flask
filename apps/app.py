@@ -1,6 +1,9 @@
-from config import app
+from . config import app, db_serv
+from .users.route_user import bd_user
 
+db_serv.init_app(app)
 
+app.register_blueprint(bd_user)
 
 
 
